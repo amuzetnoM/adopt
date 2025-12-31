@@ -126,7 +126,20 @@ import { ProjectParams } from '../services/storage.service';
            <div class="space-y-3">
             <label class="text-xs font-bold text-gray-600 uppercase tracking-widest block">Brand Colors</label>
             <div class="flex items-center gap-3">
-                 <div class="w-12 h-12 rounded-2xl neo-flat bg-gradient-to-br from-indigo-400 to-purple-500 shrink-0"></div>
+                 <input 
+                   #colorPicker
+                   type="color" 
+                   [value]="getFirstColor()" 
+                   (change)="onColorChange($event)"
+                   class="hidden"
+                 >
+                 <button 
+                   type="button"
+                   (click)="colorPicker.click()" 
+                   class="w-12 h-12 rounded-2xl neo-flat shrink-0 cursor-pointer hover:neo-hover transition-all active:neo-inset"
+                   [style.background]="getFirstColor() || 'linear-gradient(to bottom right, #818cf8, #a78bfa)'"
+                   title="Click to change color"
+                 ></button>
                  <input type="text" formControlName="brandColors" placeholder="e.g. #FF5733, #333333" class="w-full px-4 py-3 rounded-xl neo-inset bg-white outline-none text-sm font-mono text-gray-700">
             </div>
            </div>
@@ -168,18 +181,18 @@ export class SetupFormComponent implements OnInit {
   initialValues = input<ProjectParams | null>(null);
   mode = input<'create' | 'edit'>('create');
   submitForm = output<ProjectParams>();
-  
+
   isSubmitting = signal(false);
-  
+
   // File Analysis
   selectedFilePreview = signal<string | null>(null);
   selectedFileBase64: string | null = null;
   selectedFileMimeType: string = '';
   selectedFileIsImage = signal(true);
-  
+
   // URL Analysis
   urlControl = new FormControl('', [Validators.pattern(/^https?:\/\/.+/)]);
-  
+
   isAnalyzing = signal(false);
   analyzeType = signal<'file' | 'url' | null>(null);
 
@@ -228,14 +241,14 @@ export class SetupFormComponent implements OnInit {
 
   async analyzeFile() {
     if (!this.selectedFileBase64) return;
-    this.runAnalysis('file', () => 
+    this.runAnalysis('file', () =>
       this.geminiService.analyzeBrandAsset(this.selectedFileBase64!, this.selectedFileMimeType)
     );
   }
 
   async analyzeUrl() {
     if (this.urlControl.invalid || !this.urlControl.value) return;
-    this.runAnalysis('url', () => 
+    this.runAnalysis('url', () =>
       this.geminiService.analyzeWebsite(this.urlControl.value!)
     );
   }
@@ -243,7 +256,7 @@ export class SetupFormComponent implements OnInit {
   async runAnalysis(type: 'file' | 'url', analysisFn: () => Promise<any>) {
     this.isAnalyzing.set(true);
     this.analyzeType.set(type);
-    
+
     try {
       const result = await analysisFn();
       this.form.patchValue({
@@ -260,6 +273,27 @@ export class SetupFormComponent implements OnInit {
     } finally {
       this.isAnalyzing.set(false);
       this.analyzeType.set(null);
+    }
+  }
+
+  getFirstColor(): string {
+    const colors = this.form.get('brandColors')?.value;
+    if (!colors) return '';
+    // Extract first hex color from the string
+    const match = colors.match(/#[0-9A-Fa-f]{6}/);
+    return match ? match[0] : '';
+  }
+
+  onColorChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const currentColors = this.form.get('brandColors')?.value || '';
+
+    // If there are existing colors, replace the first one, otherwise set it
+    if (currentColors.includes('#')) {
+      const updated = currentColors.replace(/#[0-9A-Fa-f]{6}/, input.value);
+      this.form.patchValue({ brandColors: updated });
+    } else {
+      this.form.patchValue({ brandColors: input.value });
     }
   }
 

@@ -34,15 +34,15 @@ export class GeminiService {
   async analyzeBrandAsset(fileBase64: string, mimeType: string): Promise<BrandProfile> {
     try {
       const prompt = `
-        Analyze this brand asset. Extract:
+        Analyze this brand asset and extract the following information:
         1. Brand Name
         2. Industry
         3. Product/Service Description
         4. Target Audience
-        5. Primary Brand Colors (hex)
+        5. Primary Brand Colors - IMPORTANT: Return as hex codes in format #RRGGBB (e.g., #FF5733, #1A2B3C). Extract the most dominant colors from the image.
         6. Brand Visual Style
 
-        Return strictly JSON.
+        Return strictly JSON with these exact field names: brandName, industry, productDesc, targetAudience, brandColors, brandStyle
       `;
 
       const response = await this.ai.models.generateContent({
@@ -80,8 +80,14 @@ export class GeminiService {
   async analyzeWebsite(url: string): Promise<BrandProfile> {
     try {
       const prompt = `
-        Analyze brand at: ${url}
-        Perform a deep search for: Brand Name, Industry, Product Description, Audience, Colors, Style.
+        Analyze the brand at this URL: ${url}
+        Perform a deep search and extract:
+        - Brand Name
+        - Industry
+        - Product Description
+        - Target Audience
+        - Brand Colors: CRITICAL - Extract hex color codes in format #RRGGBB (e.g., #FF5733). Look for primary brand colors used in logo, headers, or main design elements.
+        - Visual Style
       `;
 
       const response = await this.ai.models.generateContent({
