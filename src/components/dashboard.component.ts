@@ -106,10 +106,12 @@ export class DashboardComponent {
   onCreate = output<void>();
   onSelect = output<string>();
 
-  filteredProjects = signal<Project[]>(this.storage.projects());
+  filteredProjects = signal<Project[] | null>(null);
 
   displayProjects() {
-    return this.filteredProjects().length > 0 ? this.filteredProjects() : this.storage.projects();
+    // If filter has been applied, use filtered results (even if empty)
+    // Otherwise use all projects
+    return this.filteredProjects() !== null ? this.filteredProjects()! : this.storage.projects();
   }
 
   getStatusClass(status: string): string {

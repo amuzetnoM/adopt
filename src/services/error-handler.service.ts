@@ -10,6 +10,19 @@ export interface AppError {
   autoHide?: number; // milliseconds
 }
 
+// UUID fallback for browsers without crypto.randomUUID
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback UUID v4 generator
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -20,7 +33,7 @@ export class ErrorHandlerService {
 
   showError(message: string, autoHide: number = 5000) {
     this.addError({
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       message,
       type: 'error',
       timestamp: Date.now(),
@@ -31,7 +44,7 @@ export class ErrorHandlerService {
 
   showSuccess(message: string, autoHide: number = 3000) {
     this.addError({
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       message,
       type: 'success',
       timestamp: Date.now(),
@@ -42,7 +55,7 @@ export class ErrorHandlerService {
 
   showWarning(message: string, autoHide: number = 4000) {
     this.addError({
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       message,
       type: 'warning',
       timestamp: Date.now(),
@@ -53,7 +66,7 @@ export class ErrorHandlerService {
 
   showInfo(message: string, autoHide: number = 3000) {
     this.addError({
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       message,
       type: 'info',
       timestamp: Date.now(),

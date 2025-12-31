@@ -1,4 +1,4 @@
-import { Component, inject, output, signal, computed } from '@angular/core';
+import { Component, inject, output, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StorageService, Project } from '../services/storage.service';
@@ -123,10 +123,15 @@ export class ProjectSearchComponent {
         break;
     }
 
-    // Emit changes
-    this.onFilterChange.emit(projects);
     return projects;
   });
+
+  constructor() {
+    // Emit changes when filtered projects change
+    effect(() => {
+      this.onFilterChange.emit(this.filteredProjects());
+    });
+  }
 
   hasActiveFilters = computed(() => 
     this.searchQuery() !== '' || this.statusFilter() !== 'all'
