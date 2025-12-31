@@ -19,7 +19,7 @@ export class GeminiService {
   private storage = inject(StorageService);
 
   constructor() {
-    this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    this.ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY || '' });
   }
 
   // --- HELPER: ROBUST JSON PARSING ---
@@ -91,9 +91,9 @@ export class GeminiService {
           tools: [{ googleSearch: {} }],
         }
       });
-      
+
       const searchResultText = response.text || '';
-      
+
       const formatterResponse = await this.ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Extract the brand details from this text into JSON: ${searchResultText}`,
@@ -168,8 +168,8 @@ export class GeminiService {
     params: ProjectParams,
     selectedConcepts: IdeationConcept[]
   ): Promise<FinalAd[]> {
-    const conceptsContext = selectedConcepts.map((c, i) => 
-      `Concept ${i+1}: Angle="${c.angle}", Visual="${c.visualDirection}", Mood="${c.mood}"`
+    const conceptsContext = selectedConcepts.map((c, i) =>
+      `Concept ${i + 1}: Angle="${c.angle}", Visual="${c.visualDirection}", Mood="${c.mood}"`
     ).join('\n');
 
     const prompt = `
@@ -272,7 +272,7 @@ export class GeminiService {
 
   async generateProjectSeoReport(project: Project): Promise<string> {
     const adsContext = project.finalAds.map((ad, i) => `
-      Ad ${i+1} (${ad.platform} - ${ad.variantName}):
+      Ad ${i + 1} (${ad.platform} - ${ad.variantName}):
       Headline: ${ad.headline}
       Keywords: ${ad.seo?.keywords?.join(', ')}
       Score: ${ad.seo?.score}
@@ -320,13 +320,13 @@ export class GeminiService {
           }
         },
         {
-           name: 'open_project',
-           description: 'Open a specific project by ID.',
-           parameters: {
-              type: Type.OBJECT,
-              properties: { id: { type: Type.STRING } },
-              required: ['id']
-           }
+          name: 'open_project',
+          description: 'Open a specific project by ID.',
+          parameters: {
+            type: Type.OBJECT,
+            properties: { id: { type: Type.STRING } },
+            required: ['id']
+          }
         },
         {
           name: 'create_project',
@@ -348,19 +348,19 @@ export class GeminiService {
           name: 'analyze_brand_url',
           description: 'Analyze a website URL to extract brand details.',
           parameters: {
-             type: Type.OBJECT,
-             properties: { url: { type: Type.STRING } },
-             required: ['url']
+            type: Type.OBJECT,
+            properties: { url: { type: Type.STRING } },
+            required: ['url']
           }
         },
-        
+
         // Campaign Execution Tools
         {
           name: 'generate_concepts',
           description: 'Generate ideation concepts for a project (Phase 1).',
           parameters: {
             type: Type.OBJECT,
-            properties: { 
+            properties: {
               projectId: { type: Type.STRING },
               count: { type: Type.INTEGER, description: 'Number of concepts (3-10)' }
             },
@@ -372,7 +372,7 @@ export class GeminiService {
           description: 'Mark a concept as selected/approved.',
           parameters: {
             type: Type.OBJECT,
-            properties: { 
+            properties: {
               projectId: { type: Type.STRING },
               conceptIndex: { type: Type.INTEGER, description: '0-based index of the concept to select' }
             },
@@ -402,9 +402,9 @@ export class GeminiService {
           description: 'Set a schedule time for all ads in the project.',
           parameters: {
             type: Type.OBJECT,
-            properties: { 
+            properties: {
               projectId: { type: Type.STRING },
-              timestamp: { type: Type.NUMBER, description: 'Unix timestamp' } 
+              timestamp: { type: Type.NUMBER, description: 'Unix timestamp' }
             },
             required: ['projectId', 'timestamp']
           }
@@ -463,7 +463,7 @@ export class GeminiService {
     const safeArgs = args || {};
 
     try {
-      switch(name) {
+      switch (name) {
         // --- Navigation ---
         case 'navigate':
           if (!safeArgs.view) return { error: true, message: 'Missing view' };
@@ -474,7 +474,7 @@ export class GeminiService {
           if (!safeArgs.id) return { error: true, message: 'Missing project ID' };
           this.storage.openProject(safeArgs.id);
           return { success: true, message: `Opened project ${safeArgs.id}` };
-        
+
         // --- Creation ---
         case 'create_project':
           if (!safeArgs.brandName) return { error: true, message: 'Missing brand name' };
@@ -493,19 +493,19 @@ export class GeminiService {
           if (!safeArgs.url) return { error: true, message: 'Missing URL' };
           const profile = await this.analyzeWebsite(safeArgs.url);
           return { success: true, data: profile };
-        
+
         // --- Phase 1: Ideation ---
         case 'generate_concepts': {
           if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
           const p = this.storage.getProject(safeArgs.projectId);
           if (!p) return { error: 'Project not found' };
-          
+
           // Use default if count is missing or 0
           const count = Number(safeArgs.count) || 3;
-          
+
           const concepts = await this.generateIdeationConcepts(p.params, count);
-          this.storage.updateProject(safeArgs.projectId, { 
-            ideationConcepts: concepts, 
+          this.storage.updateProject(safeArgs.projectId, {
+            ideationConcepts: concepts,
             stage: 'ideation',
             status: 'ideation'
           });
@@ -519,9 +519,9 @@ export class GeminiService {
           const idx = Number(safeArgs.conceptIndex);
           const c = p.ideationConcepts[idx];
           if (!c) return { error: 'Concept index out of bounds' };
-          
+
           // Toggle selection true
-          const updated = p.ideationConcepts.map((item, i) => 
+          const updated = p.ideationConcepts.map((item, i) =>
             i === idx ? { ...item, isSelected: true } : item
           );
           this.storage.updateProject(safeArgs.projectId, { ideationConcepts: updated });
@@ -533,14 +533,14 @@ export class GeminiService {
           if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
           const p = this.storage.getProject(safeArgs.projectId);
           if (!p) return { error: 'Project not found' };
-          
+
           const selected = p.ideationConcepts.filter(c => c.isSelected);
           if (selected.length === 0) return { error: 'No concepts selected. Use select_concept first.' };
-          
+
           const finalAds = await this.generateFinalAds(p.params, selected);
-          this.storage.updateProject(safeArgs.projectId, { 
-            finalAds, 
-            stage: 'final', 
+          this.storage.updateProject(safeArgs.projectId, {
+            finalAds,
+            stage: 'final',
             status: 'production'
           });
           return { success: true, count: finalAds.length, message: 'Ad copy generated with SEO metadata. Visuals pending.' };
@@ -551,26 +551,26 @@ export class GeminiService {
           if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
           const p = this.storage.getProject(safeArgs.projectId);
           if (!p) return { error: 'Project not found' };
-          
+
           const adsToGen = p.finalAds.filter(a => !a.imageUrl);
-          
+
           // Trigger async (not awaiting full completion to keep chat responsive)
           adsToGen.forEach(async (ad) => {
-             this.storage.updateProject(safeArgs.projectId, { 
-               finalAds: this.storage.getProject(safeArgs.projectId)!.finalAds.map(x => x.id === ad.id ? { ...x, isLoadingImage: true } : x) 
-             });
-             try {
-               const url = await this.generateAdImage(ad.visualPrompt);
-               this.storage.updateProject(safeArgs.projectId, { 
-                 finalAds: this.storage.getProject(safeArgs.projectId)!.finalAds.map(x => x.id === ad.id ? { ...x, isLoadingImage: false, imageUrl: url || undefined } : x) 
-               });
-             } catch {
-               this.storage.updateProject(safeArgs.projectId, { 
-                 finalAds: this.storage.getProject(safeArgs.projectId)!.finalAds.map(x => x.id === ad.id ? { ...x, isLoadingImage: false } : x) 
-               });
-             }
+            this.storage.updateProject(safeArgs.projectId, {
+              finalAds: this.storage.getProject(safeArgs.projectId)!.finalAds.map(x => x.id === ad.id ? { ...x, isLoadingImage: true } : x)
+            });
+            try {
+              const url = await this.generateAdImage(ad.visualPrompt);
+              this.storage.updateProject(safeArgs.projectId, {
+                finalAds: this.storage.getProject(safeArgs.projectId)!.finalAds.map(x => x.id === ad.id ? { ...x, isLoadingImage: false, imageUrl: url || undefined } : x)
+              });
+            } catch {
+              this.storage.updateProject(safeArgs.projectId, {
+                finalAds: this.storage.getProject(safeArgs.projectId)!.finalAds.map(x => x.id === ad.id ? { ...x, isLoadingImage: false } : x)
+              });
+            }
           });
-          
+
           return { success: true, message: `Triggered image generation for ${adsToGen.length} ads.` };
         }
 
@@ -584,63 +584,63 @@ export class GeminiService {
         }
 
         case 'generate_seo_report': {
-           if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
-           const p = this.storage.getProject(safeArgs.projectId);
-           if (!p) return { error: 'Project not found' };
-           
-           const report = await this.generateProjectSeoReport(p);
-           this.storage.updateProject(safeArgs.projectId, { seoReport: report });
-           return { success: true, message: 'SEO Report generated successfully.' };
+          if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
+          const p = this.storage.getProject(safeArgs.projectId);
+          if (!p) return { error: 'Project not found' };
+
+          const report = await this.generateProjectSeoReport(p);
+          this.storage.updateProject(safeArgs.projectId, { seoReport: report });
+          return { success: true, message: 'SEO Report generated successfully.' };
         }
 
         case 'get_project_details': {
-           if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
-           const p = this.storage.getProject(safeArgs.projectId);
-           if (!p) return { error: 'Project not found' };
-           return { success: true, data: p };
+          if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
+          const p = this.storage.getProject(safeArgs.projectId);
+          if (!p) return { error: 'Project not found' };
+          return { success: true, data: p };
         }
 
         case 'list_all_projects': {
-           const projects = this.storage.projects().map(p => ({
-             id: p.id,
-             name: p.name,
-             status: p.status,
-             brandName: p.params.brandName,
-             industry: p.params.industry,
-             createdAt: p.createdAt,
-             lastModified: p.lastModified,
-             conceptCount: p.ideationConcepts.length,
-             adCount: p.finalAds.length
-           }));
-           return { success: true, count: projects.length, projects };
+          const projects = this.storage.projects().map(p => ({
+            id: p.id,
+            name: p.name,
+            status: p.status,
+            brandName: p.params.brandName,
+            industry: p.params.industry,
+            createdAt: p.createdAt,
+            lastModified: p.lastModified,
+            conceptCount: p.ideationConcepts.length,
+            adCount: p.finalAds.length
+          }));
+          return { success: true, count: projects.length, projects };
         }
 
         case 'delete_project': {
-           if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
-           const p = this.storage.getProject(safeArgs.projectId);
-           if (!p) return { error: 'Project not found' };
-           this.storage.deleteProject(safeArgs.projectId);
-           return { success: true, message: `Deleted project: ${p.name}` };
+          if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
+          const p = this.storage.getProject(safeArgs.projectId);
+          if (!p) return { error: 'Project not found' };
+          this.storage.deleteProject(safeArgs.projectId);
+          return { success: true, message: `Deleted project: ${p.name}` };
         }
 
         case 'export_project_data': {
-           if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
-           const p = this.storage.getProject(safeArgs.projectId);
-           if (!p) return { error: 'Project not found' };
-           
-           // Trigger export (simplified - actual implementation would use DataBackupService)
-           const jsonString = JSON.stringify(p, null, 2);
-           const blob = new Blob([jsonString], { type: 'application/json' });
-           const url = URL.createObjectURL(blob);
-           const link = document.createElement('a');
-           link.href = url;
-           link.download = `${p.name.replace(/[^a-z0-9]/gi, '_')}-${Date.now()}.json`;
-           document.body.appendChild(link);
-           link.click();
-           document.body.removeChild(link);
-           URL.revokeObjectURL(url);
-           
-           return { success: true, message: `Exported project: ${p.name}` };
+          if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
+          const p = this.storage.getProject(safeArgs.projectId);
+          if (!p) return { error: 'Project not found' };
+
+          // Trigger export (simplified - actual implementation would use DataBackupService)
+          const jsonString = JSON.stringify(p, null, 2);
+          const blob = new Blob([jsonString], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${p.name.replace(/[^a-z0-9]/gi, '_')}-${Date.now()}.json`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+
+          return { success: true, message: `Exported project: ${p.name}` };
         }
 
         default:
