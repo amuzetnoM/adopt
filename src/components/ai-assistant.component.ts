@@ -229,7 +229,7 @@ export class AiAssistantComponent {
 
     try {
       // 1. Send initial user message
-      let response = await this.chatSession.sendMessage(userText);
+      let response = await this.chatSession.sendMessage({ message: userText });
       
       // 2. Loop to handle ANY tool calls
       while (response.candidates?.[0]?.content?.parts?.some(p => !!p.functionCall)) {
@@ -263,19 +263,18 @@ export class AiAssistantComponent {
           functionResponses.push({
             functionResponse: {
               name: call.name,
-              response: { result: safeResult }
+              response: safeResult
             }
           });
         }
 
         // Send tool outputs back to model
-        // IMPORTANT: Must wrap in a Content object with role 'tool'
-        const toolContent: Content = {
-          role: 'tool',
-          parts: functionResponses
-        };
-
-        response = await this.chatSession.sendMessage(toolContent);
+        if (functionResponses.length > 0) {
+           response = await this.chatSession.sendMessage({ message: functionResponses });
+        } else {
+           // Should not happen if loop condition is met, but safety break
+           break;
+        }
       }
 
       // 3. Final Text Response
@@ -285,14 +284,14 @@ export class AiAssistantComponent {
       }
 
     } catch (e: any) {
-      console.error('Agent Error:', e);
+      console.error('Operator Error:', e);
       // Reset session on fatal protocol errors
       if (e.message?.includes('ContentUnion') || e.message?.includes('Malformed')) {
-         this.messages.update(m => [...m, { role: 'model', text: 'System protocol mismatch. Resetting agent context...', isError: true }]);
+         this.messages.update(m => [...m, { role: 'model', text: 'Protocol sync error. Resetting operator context...', isError: true }]);
          this.chatSession = null;
          this.initSession();
       } else {
-         this.messages.update(m => [...m, { role: 'model', text: 'I encountered an error: ' + e.message, isError: true }]);
+         this.messages.update(m => [...m, { role: 'model', text: 'System notification: ' + e.message, isError: true }]);
       }
     } finally {
       this.isThinking.set(false);

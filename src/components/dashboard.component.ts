@@ -47,8 +47,8 @@ import { StorageService, Project } from '../services/storage.service';
                      {{ project.params.brandName.charAt(0).toUpperCase() }}
                   </div>
                   
-                  <button (click)="onDelete($event, project.id)" class="text-slate-300 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50 z-10">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                  <button (click)="onDelete($event, project.id)" class="text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all p-2 rounded-full z-20 relative" title="Delete Project">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 pointer-events-none">
                       <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
                     </svg>
                   </button>
@@ -112,7 +112,11 @@ export class DashboardComponent {
   }
 
   onDelete(event: Event, id: string) {
+    // Crucial: Stop all propagation to prevent opening the project card
+    event.preventDefault();
+    event.stopImmediatePropagation();
     event.stopPropagation();
+    
     if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
       this.storage.deleteProject(id);
     }

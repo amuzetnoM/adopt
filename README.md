@@ -1,5 +1,5 @@
 # AdOpt: AI-Driven Advertising Platform
-> LEGION PROTOCOL: Autonomous Operators
+> Legion: Ad Operators
 
 **AdOpt** is an enterprise-grade, single-page application (SPA) built with Angular v18+ (Zoneless) that leverages Google's Gemini 2.5 Flash and Imagen 4.0 models to automate the entire advertising campaign lifecycle. 
 

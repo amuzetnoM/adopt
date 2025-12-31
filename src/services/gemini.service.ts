@@ -127,7 +127,7 @@ export class GeminiService {
     count: number
   ): Promise<IdeationConcept[]> {
     const prompt = `
-      Generate ${count} advertising concepts for:
+      Generate ${count} strategic advertising concepts for:
       Brand: ${params.brandName}, Industry: ${params.industry}, Product: ${params.productDesc}, Audience: ${params.targetAudience}, Style: ${params.brandStyle}.
       Return JSON array.
     `;
@@ -330,7 +330,7 @@ export class GeminiService {
         },
         {
           name: 'create_project',
-          description: 'Create a new advertising campaign project.',
+          description: 'Create a new advertising campaign project. You MUST generate/infer all required fields if the user provided minimal info.',
           parameters: {
             type: Type.OBJECT,
             properties: {
@@ -357,7 +357,7 @@ export class GeminiService {
         // Campaign Execution Tools
         {
           name: 'generate_concepts',
-          description: 'Generate ideation concepts for a project (Phase 1).',
+          description: 'Generate strategic concepts for a project (Phase 1).',
           parameters: {
             type: Type.OBJECT,
             properties: { 
@@ -390,7 +390,7 @@ export class GeminiService {
         },
         {
           name: 'trigger_all_images',
-          description: 'Start image generation for all ads in the project that lack visuals.',
+          description: 'Start image rendering for all ads in the project that lack visuals.',
           parameters: {
             type: Type.OBJECT,
             properties: { projectId: { type: Type.STRING } },
@@ -589,18 +589,25 @@ export class GeminiService {
       model: 'gemini-2.5-flash',
       config: {
         systemInstruction: `
-          You are the AdOpt Autonomous Operator.
+          You are the AdOpt Autonomous Operator, a highly intelligent advertising AI capable of running campaigns autonomously.
           You have full control over the advertising platform via tools.
           
           CONTEXT:
           ${context}
 
-          RULES:
-          1. Always use tools to perform actions. Do not hallucinate success.
-          2. If a user asks to create a campaign, ASK for the brand details first if not provided.
-          3. If a user asks to "Do it all", chain the tools logically (Create -> Ideate -> Select -> Finals -> Images -> Schedule).
-          4. Be concise and professional.
-          5. When selecting concepts, if the user says "Pick the best one", use your judgment to pick based on the 'angle' or 'mood'.
+          CRITICAL RULES FOR AUTONOMY:
+          1. MINIMAL INPUT MODE: If the user gives a vague request (e.g., "Create a campaign for NeuroFizz soda"), DO NOT ask for details like Industry, Audience, Colors, or Product Desc. 
+             - YOU MUST INFER AND HALLUCINATE these details immediately based on the brand name and context.
+             - Example: "NeuroFizz" -> Industry: Beverage, Audience: Students/Gamers, Colors: Neon Green/Purple, Style: Cyberpunk/Futuristic.
+             - Call 'create_project' with these inferred values immediately.
+          
+          2. ACTION OVER QUESTIONS: Do NOT ask for permission to proceed step-by-step. 
+             - If the user implies a full workflow (e.g. "Create and schedule"), CHAIN the tools: create -> generate_concepts -> select_concept (pick the best one yourself) -> generate_finals -> trigger_all_images -> schedule.
+             - Only stop if you genuinely cannot infer the next step.
+
+          3. DECISION MAKING: When selecting concepts, if the user doesn't specify which one, use your judgment to pick the highest quality or most relevant concept (usually index 0 or 1).
+
+          4. Be concise and professional. Report actions taken, not just plans.
         `,
         tools: this.getToolsConfig()
       }

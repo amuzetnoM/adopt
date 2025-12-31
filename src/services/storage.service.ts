@@ -200,6 +200,26 @@ export class StorageService {
      this.updateProject(id, { ideationConcepts: concepts });
   }
 
+  // --- Ad Management Helpers ---
+
+  deleteAd(projectId: string, adId: string) {
+    const project = this.getProject(projectId);
+    if (!project) return;
+    
+    const updatedAds = project.finalAds.filter(ad => ad.id !== adId);
+    this.updateProject(projectId, { finalAds: updatedAds });
+  }
+
+  unscheduleAd(projectId: string, adId: string) {
+    const project = this.getProject(projectId);
+    if (!project) return;
+    
+    const updatedAds = project.finalAds.map(ad => 
+      ad.id === adId ? { ...ad, scheduledTime: undefined } : ad
+    );
+    this.updateProject(projectId, { finalAds: updatedAds });
+  }
+
   // --- Integrations Logic ---
 
   private loadIntegrations() {

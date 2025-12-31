@@ -8,8 +8,17 @@ import { FinalAd } from '../services/storage.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="h-full flex flex-col bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 group hover:-translate-y-1">
+    <div class="h-full flex flex-col bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 group hover:-translate-y-1 relative">
       
+      <!-- Top Right Actions Menu -->
+      <div class="absolute top-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button (click)="onDelete.emit()" class="bg-white/90 backdrop-blur text-slate-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full border border-slate-200 shadow-sm transition-colors" title="Delete Ad">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+          </svg>
+        </button>
+      </div>
+
       <!-- Image Area -->
       <div class="relative aspect-[3/4] bg-slate-100 w-full overflow-hidden">
         @if (ad().imageUrl) {
@@ -48,7 +57,7 @@ import { FinalAd } from '../services/storage.service';
           
           <!-- SEO SCORE BADGE -->
           @if (ad().seo) {
-            <div class="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-2 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center gap-2 z-10 border border-slate-100">
+            <div class="absolute top-4 right-14 bg-white/95 backdrop-blur-md px-2 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center gap-2 z-10 border border-slate-100">
                <span class="text-slate-400">SEO</span>
                <div [class]="'flex items-center gap-1 ' + (ad().seo!.score >= 80 ? 'text-green-600' : 'text-amber-500')">
                  <span class="text-sm">{{ ad().seo!.score }}</span>
@@ -150,12 +159,38 @@ import { FinalAd } from '../services/storage.service';
            </div>
            
            @if (ad().scheduledTime) {
-             <div class="w-full py-2.5 rounded-xl bg-green-50 text-green-700 border border-green-200 flex items-center justify-center gap-2 text-sm font-semibold shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{{ ad().scheduledTime | date:'MMM d, h:mm a' }}</span>
+             <div class="group/schedule relative">
+               <button (click)="isScheduling.set(true)" class="w-full py-2.5 rounded-xl bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 flex items-center justify-center gap-2 text-sm font-semibold shadow-sm transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{{ ad().scheduledTime | date:'MMM d, h:mm a' }}</span>
+               </button>
+               
+               <!-- Unschedule Button (Visible on hover) -->
+               <button (click)="onUnschedule.emit()" class="absolute -top-2 -right-2 bg-red-100 hover:bg-red-500 hover:text-white text-red-600 p-1 rounded-full shadow-md opacity-0 group-hover/schedule:opacity-100 transition-all z-20" title="Unschedule">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3">
+                   <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                 </svg>
+               </button>
              </div>
+             
+             <!-- Re-schedule Modal if clicked -->
+             @if(isScheduling()) {
+               <div class="mt-2 bg-white border border-indigo-100 p-2 rounded-xl shadow-lg absolute bottom-0 left-0 w-full z-30 animate-fade-in-up">
+                  <label class="text-xs font-bold text-indigo-800 mb-1 block">Edit Schedule</label>
+                  <input 
+                    type="datetime-local" 
+                    [(ngModel)]="scheduleDate"
+                    class="w-full px-2 py-1.5 rounded-lg border border-indigo-200 text-xs mb-2 focus:outline-none focus:border-indigo-500 text-slate-700"
+                  >
+                  <div class="flex gap-2">
+                     <button (click)="confirmSchedule()" class="flex-1 bg-indigo-600 text-white text-xs font-bold py-1.5 rounded-lg hover:bg-indigo-700">Update</button>
+                     <button (click)="isScheduling.set(false)" class="flex-1 bg-white text-slate-500 text-xs font-bold py-1.5 rounded-lg hover:bg-slate-50 border border-slate-100">Cancel</button>
+                  </div>
+               </div>
+             }
+             
            } @else {
              
              @if (!isScheduling()) {
@@ -207,6 +242,8 @@ export class AdCardComponent {
   ad = input.required<FinalAd>();
   onGenerateImage = output<void>();
   onSchedule = output<number>(); // Emits timestamp
+  onUnschedule = output<void>();
+  onDelete = output<void>();
 
   isScheduling = signal(false);
   scheduleDate = signal('');

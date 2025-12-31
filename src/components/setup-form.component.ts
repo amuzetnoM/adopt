@@ -96,9 +96,8 @@ import { ProjectParams } from '../services/storage.service';
             </div>
           </div>
         </div>
-      </div>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 md:p-10 pt-0 space-y-8">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 md:p-10 pt-0 space-y-8">
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div class="space-y-3">
@@ -185,7 +184,7 @@ export class SetupFormComponent implements OnInit {
   analyzeType = signal<'file' | 'url' | null>(null);
 
   geminiService = inject(GeminiService);
-  fb = inject(FormBuilder);
+  fb: FormBuilder = inject(FormBuilder);
   form: FormGroup;
 
   constructor() {

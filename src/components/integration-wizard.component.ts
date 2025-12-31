@@ -287,7 +287,7 @@ type WizardStep = 'select' | 'configure' | 'connecting' | 'success' | 'manage';
 })
 export class IntegrationWizardComponent {
   storage = inject(StorageService);
-  fb = inject(FormBuilder);
+  fb: FormBuilder = inject(FormBuilder);
 
   currentStep = signal<WizardStep>('manage');
   selectedIds = signal<Set<PlatformId>>(new Set());

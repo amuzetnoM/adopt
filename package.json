@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "ng serve",
-    "start": "ng serve",
     "build": "ng build",
     "preview": "ng serve --configuration=production"
   },
@@ -24,7 +23,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
-    "typescript": "^5.9.0",
+    "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }
 }
