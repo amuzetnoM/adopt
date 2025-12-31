@@ -10,6 +10,7 @@ import { ToastNotificationsComponent } from './components/toast-notifications.co
 import { SettingsMenuComponent } from './components/settings-menu.component';
 import { StorageService, ProjectParams } from './services/storage.service';
 import { I18nService } from './services/i18n.service';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -20,11 +21,12 @@ import { I18nService } from './services/i18n.service';
 export class AppComponent {
   storage = inject(StorageService);
   i18n = inject(I18nService);
+  theme = inject(ThemeService);
 
   // We now read signals directly from storage which the AI can also manipulate
   currentView = this.storage.currentView;
   selectedProjectId = this.storage.selectedProjectId;
-  
+
   isSidebarOpen = signal(false);
 
   // Sidebar Actions
@@ -34,6 +36,20 @@ export class AppComponent {
 
   closeSidebar() {
     this.isSidebarOpen.set(false);
+  }
+
+  getBgStyle(type: 'root' | 'sidebar'): string {
+    const d = this.theme.darkness();
+    // Lightness: 96 -> 10 (Root), 98 -> 15 (Sidebar)
+    const l1 = Math.max(10, 96 - d * 0.86);
+    const l2 = Math.max(10, 93 - d * 0.83);
+
+    if (type === 'root') {
+      return `linear-gradient(135deg, hsl(210, 20%, ${l2}%), hsl(210, 20%, ${l1}%))`;
+    } else {
+      // Sidebar uses semi-transparent overlay logic or just lighter/darker shift
+      return `linear-gradient(180deg, hsl(210, 15%, ${l1}%), hsl(210, 15%, ${l2}%))`;
+    }
   }
 
   // Navigation Methods (Proxies to Storage)
