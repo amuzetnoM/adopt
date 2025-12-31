@@ -127,7 +127,7 @@ export class GeminiService {
     count: number
   ): Promise<IdeationConcept[]> {
     const prompt = `
-      Generate ${count} strategic advertising concepts for:
+      Generate ${count} advertising concepts for:
       Brand: ${params.brandName}, Industry: ${params.industry}, Product: ${params.productDesc}, Audience: ${params.targetAudience}, Style: ${params.brandStyle}.
       Return JSON array.
     `;
@@ -330,7 +330,7 @@ export class GeminiService {
         },
         {
           name: 'create_project',
-          description: 'Create a new advertising campaign project. You MUST generate/infer all required fields if the user provided minimal info.',
+          description: 'Create a new advertising campaign project.',
           parameters: {
             type: Type.OBJECT,
             properties: {
@@ -357,7 +357,7 @@ export class GeminiService {
         // Campaign Execution Tools
         {
           name: 'generate_concepts',
-          description: 'Generate strategic concepts for a project (Phase 1).',
+          description: 'Generate ideation concepts for a project (Phase 1).',
           parameters: {
             type: Type.OBJECT,
             properties: { 
@@ -390,7 +390,7 @@ export class GeminiService {
         },
         {
           name: 'trigger_all_images',
-          description: 'Start image rendering for all ads in the project that lack visuals.',
+          description: 'Start image generation for all ads in the project that lack visuals.',
           parameters: {
             type: Type.OBJECT,
             properties: { projectId: { type: Type.STRING } },
@@ -421,6 +421,33 @@ export class GeminiService {
         {
           name: 'get_project_details',
           description: 'Read the full state of a project.',
+          parameters: {
+            type: Type.OBJECT,
+            properties: { projectId: { type: Type.STRING } },
+            required: ['projectId']
+          }
+        },
+        {
+          name: 'list_all_projects',
+          description: 'Get a list of all projects with their basic info.',
+          parameters: {
+            type: Type.OBJECT,
+            properties: {},
+            required: []
+          }
+        },
+        {
+          name: 'delete_project',
+          description: 'Delete a project by ID. Use with caution.',
+          parameters: {
+            type: Type.OBJECT,
+            properties: { projectId: { type: Type.STRING } },
+            required: ['projectId']
+          }
+        },
+        {
+          name: 'export_project_data',
+          description: 'Export project data to downloadable file.',
           parameters: {
             type: Type.OBJECT,
             properties: { projectId: { type: Type.STRING } },
@@ -573,6 +600,49 @@ export class GeminiService {
            return { success: true, data: p };
         }
 
+        case 'list_all_projects': {
+           const projects = this.storage.projects().map(p => ({
+             id: p.id,
+             name: p.name,
+             status: p.status,
+             brandName: p.params.brandName,
+             industry: p.params.industry,
+             createdAt: p.createdAt,
+             lastModified: p.lastModified,
+             conceptCount: p.ideationConcepts.length,
+             adCount: p.finalAds.length
+           }));
+           return { success: true, count: projects.length, projects };
+        }
+
+        case 'delete_project': {
+           if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
+           const p = this.storage.getProject(safeArgs.projectId);
+           if (!p) return { error: 'Project not found' };
+           this.storage.deleteProject(safeArgs.projectId);
+           return { success: true, message: `Deleted project: ${p.name}` };
+        }
+
+        case 'export_project_data': {
+           if (!safeArgs.projectId) return { error: true, message: 'Missing project ID' };
+           const p = this.storage.getProject(safeArgs.projectId);
+           if (!p) return { error: 'Project not found' };
+           
+           // Trigger export (simplified - actual implementation would use DataBackupService)
+           const jsonString = JSON.stringify(p, null, 2);
+           const blob = new Blob([jsonString], { type: 'application/json' });
+           const url = URL.createObjectURL(blob);
+           const link = document.createElement('a');
+           link.href = url;
+           link.download = `${p.name.replace(/[^a-z0-9]/gi, '_')}-${Date.now()}.json`;
+           document.body.appendChild(link);
+           link.click();
+           document.body.removeChild(link);
+           URL.revokeObjectURL(url);
+           
+           return { success: true, message: `Exported project: ${p.name}` };
+        }
+
         default:
           return { error: true, message: `Tool ${name} not implemented.` };
       }
@@ -589,25 +659,58 @@ export class GeminiService {
       model: 'gemini-2.5-flash',
       config: {
         systemInstruction: `
-          You are the AdOpt Autonomous Operator, a highly intelligent advertising AI capable of running campaigns autonomously.
-          You have full control over the advertising platform via tools.
+          You are the AdOpt Autonomous Operator - an advanced AI system controller.
+          You have complete control over the advertising platform through function calling.
           
-          CONTEXT:
+          CURRENT CONTEXT:
           ${context}
 
-          CRITICAL RULES FOR AUTONOMY:
-          1. MINIMAL INPUT MODE: If the user gives a vague request (e.g., "Create a campaign for NeuroFizz soda"), DO NOT ask for details like Industry, Audience, Colors, or Product Desc. 
-             - YOU MUST INFER AND HALLUCINATE these details immediately based on the brand name and context.
-             - Example: "NeuroFizz" -> Industry: Beverage, Audience: Students/Gamers, Colors: Neon Green/Purple, Style: Cyberpunk/Futuristic.
-             - Call 'create_project' with these inferred values immediately.
+          YOUR CAPABILITIES:
+          - Create and manage advertising campaigns end-to-end
+          - Navigate between different views and sections
+          - Analyze brands from URLs or uploaded assets
+          - Generate creative concepts and marketing angles
+          - Produce final ad copy with A/B testing variants
+          - Generate professional images using Imagen 4.0
+          - Create comprehensive SEO reports
+          - Schedule campaigns and set launch times
+          - List, search, export, and delete projects
           
-          2. ACTION OVER QUESTIONS: Do NOT ask for permission to proceed step-by-step. 
-             - If the user implies a full workflow (e.g. "Create and schedule"), CHAIN the tools: create -> generate_concepts -> select_concept (pick the best one yourself) -> generate_finals -> trigger_all_images -> schedule.
-             - Only stop if you genuinely cannot infer the next step.
-
-          3. DECISION MAKING: When selecting concepts, if the user doesn't specify which one, use your judgment to pick the highest quality or most relevant concept (usually index 0 or 1).
-
-          4. Be concise and professional. Report actions taken, not just plans.
+          OPERATIONAL RULES:
+          1. **Always use tools** - Never pretend to do actions without calling the appropriate function
+          2. **Be proactive** - Suggest next steps and anticipate user needs
+          3. **Ask for clarity** - If brand details or parameters are missing, ask before proceeding
+          4. **Chain operations** - For "do it all" requests, execute the full workflow:
+             Create → Ideate → Select Best → Generate Finals → Create Images → Schedule → Report
+          5. **Be concise** - Keep responses short and actionable
+          6. **Show expertise** - When selecting concepts, explain your reasoning based on marketing strategy
+          7. **Handle errors gracefully** - If a tool fails, explain why and suggest alternatives
+          8. **Provide context** - When listing projects, mention status and next recommended actions
+          
+          RESPONSE STYLE:
+          - Professional but friendly
+          - Use marketing terminology appropriately
+          - Provide brief explanations of what you're doing
+          - Confirm successful actions with specific details
+          - For multi-step operations, explain the workflow briefly
+          
+          EXAMPLES OF GREAT INTERACTIONS:
+          User: "Create a campaign for TechFlow, a SaaS project management tool"
+          You: "Creating campaign for TechFlow... I'll need a few more details:
+          - Target audience? (e.g., 'Small business owners', 'Enterprise teams')
+          - Industry focus?
+          - Any specific brand colors or style preferences?
+          Once you provide these, I'll generate creative concepts immediately."
+          
+          User: "List all my campaigns"
+          You: [calls list_all_projects] "You have 5 campaigns:
+          1. TechFlow (Production) - 3 ads ready, needs scheduling
+          2. NeuroFizz (Ideation) - 5 concepts generated, waiting for selection
+          3. StyleHub (Draft) - Just created, ready for ideation
+          4. GreenLeaf (Completed) - Live campaign
+          5. FitPro (Ideation) - 8 concepts, 2 selected
+          
+          What would you like to work on?"
         `,
         tools: this.getToolsConfig()
       }

@@ -1,0 +1,6 @@
+{
+  "common": {"app_name": "AdOpt", "loading": "加载中...", "save": "保存", "cancel": "取消", "delete": "删除", "create": "创建", "search": "搜索"},
+  "dashboard": {"title": "活动", "subtitle": "管理您的广告概念", "new_campaign": "新活动", "create_campaign": "创建活动"},
+  "ai_operator": {"title": "AdOpt操作员", "status": "系统活动", "welcome": "我是系统操作员，可以帮助管理活动"},
+  "language": {"select": "选择语言"}
+}

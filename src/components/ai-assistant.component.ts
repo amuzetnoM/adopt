@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../services/gemini.service';
 import { StorageService } from '../services/storage.service';
+import { AiWorkflowService } from '../services/ai-workflow.service';
 import { Chat, Part, Content } from '@google/genai';
 
 interface ChatMessage {
@@ -11,6 +12,7 @@ interface ChatMessage {
   isTool?: boolean;
   toolName?: string;
   isError?: boolean;
+  timestamp?: number;
 }
 
 @Component({
@@ -52,11 +54,25 @@ interface ChatMessage {
             <div class="flex gap-3 animate-slide-up">
                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 shrink-0 text-xs font-bold border border-indigo-200">OP</div>
                <div class="bg-white border border-slate-100 p-4 rounded-2xl rounded-tl-none text-sm text-slate-700 shadow-sm leading-relaxed">
-                 <p>I am the system operator. I can help manage your campaigns, generate concepts, and schedule assets.</p>
-                 <div class="mt-3 flex flex-wrap gap-2">
-                    <button (click)="quickPrompt('Create a new campaign')" class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">Create Campaign</button>
-                    <button (click)="quickPrompt('Generate 5 concepts')" class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">Generate Ideas</button>
-                 </div>
+                 <p class="font-semibold text-indigo-900 mb-1">👋 AdOpt Operator Ready</p>
+                 <p class="text-slate-600">I'm your autonomous advertising assistant. I can create complete campaigns, generate concepts, produce ads, and schedule everything—all from a single command.</p>
+                 
+                 @if (suggestions().length > 0) {
+                   <div class="mt-4 space-y-2">
+                     <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Suggested Actions:</p>
+                     <div class="flex flex-wrap gap-2">
+                       @for (suggestion of suggestions().slice(0, 4); track suggestion.title) {
+                         <button 
+                           (click)="quickPrompt(suggestion.prompt)" 
+                           class="text-xs bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 px-3 py-2 rounded-lg hover:from-indigo-100 hover:to-purple-100 transition-all border border-indigo-100 hover:border-indigo-200 shadow-sm hover:shadow flex items-center gap-1.5"
+                         >
+                           <span>{{ suggestion.icon }}</span>
+                           <span class="font-medium">{{ suggestion.title }}</span>
+                         </button>
+                       }
+                     </div>
+                   </div>
+                 }
                </div>
             </div>
 
@@ -176,6 +192,10 @@ export class AiAssistantComponent {
 
   geminiService = inject(GeminiService);
   storageService = inject(StorageService);
+  workflowService = inject(AiWorkflowService);
+
+  // Get dynamic suggestions
+  suggestions = this.workflowService.suggestions;
 
   private chatSession: Chat | null = null;
 
@@ -210,11 +230,12 @@ export class AiAssistantComponent {
     const projects = this.storageService.projects();
     const currentView = this.storageService.currentView();
     const activeProject = this.storageService.getProject(this.storageService.selectedProjectId() || '');
+    const workflowContext = this.workflowService.getContextSummary();
     
     return `
       Current App View: ${currentView}
-      Total Projects: ${projects.length}
-      Active Project: ${activeProject ? activeProject.name + ' (' + activeProject.stage + ')' : 'None'}
+      ${workflowContext}
+      Active Project: ${activeProject ? activeProject.name + ' (' + activeProject.status + ')' : 'None'}
     `;
   }
 
@@ -269,12 +290,7 @@ export class AiAssistantComponent {
         }
 
         // Send tool outputs back to model
-        if (functionResponses.length > 0) {
-           response = await this.chatSession.sendMessage({ message: functionResponses });
-        } else {
-           // Should not happen if loop condition is met, but safety break
-           break;
-        }
+        response = await this.chatSession.sendMessage({ message: functionResponses });
       }
 
       // 3. Final Text Response

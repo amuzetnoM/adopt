@@ -1,0 +1,140 @@
+{
+  "common": {
+    "app_name": "AdOpt",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "settings": "Settings",
+    "help": "Help",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Campaigns",
+    "subtitle": "Manage your advertising concepts and strategies.",
+    "new_campaign": "New Campaign",
+    "create_campaign": "Create Campaign",
+    "create_description": "Start a new strategy with automated insights.",
+    "no_campaigns": "No campaigns yet. Create your first one!",
+    "last_modified": "Last modified",
+    "created": "Created",
+    "status": {
+      "draft": "Draft",
+      "ideation": "Ideation",
+      "production": "Production",
+      "completed": "Completed"
+    }
+  },
+  "project": {
+    "details": "Project Details",
+    "brand_info": "Brand Information",
+    "concepts": "Concepts",
+    "final_ads": "Final Ads",
+    "analytics": "Analytics",
+    "schedule": "Schedule",
+    "generate_concepts": "Generate Concepts",
+    "generate_finals": "Generate Finals",
+    "generate_images": "Generate Images",
+    "generate_report": "Generate Report",
+    "select_concept": "Select Concept",
+    "concept_selected": "Concept Selected",
+    "downloading": "Downloading...",
+    "no_concepts": "No concepts generated yet.",
+    "no_ads": "No ads generated yet."
+  },
+  "setup": {
+    "title": "Campaign Setup",
+    "brand_name": "Brand Name",
+    "industry": "Industry",
+    "product_description": "Product Description",
+    "target_audience": "Target Audience",
+    "brand_colors": "Brand Colors",
+    "brand_style": "Brand Style",
+    "analyze_website": "Analyze Website",
+    "upload_brand_asset": "Upload Brand Asset",
+    "website_url": "Website URL",
+    "enter_url": "Enter URL to analyze",
+    "analyzing": "Analyzing...",
+    "upload_file": "Upload File"
+  },
+  "integrations": {
+    "title": "Integrations",
+    "subtitle": "Connect your advertising platforms.",
+    "connected": "Connected",
+    "not_connected": "Not Connected",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "configure": "Configure",
+    "test_connection": "Test Connection",
+    "last_sync": "Last synced",
+    "status": "Status",
+    "setup_guide": "Setup Guide",
+    "api_key": "API Key",
+    "client_id": "Client ID",
+    "client_secret": "Client Secret",
+    "save_integration": "Save Integration"
+  },
+  "ai_operator": {
+    "title": "AdOpt Operator",
+    "status": "System Active",
+    "welcome": "I am the system operator. I can help manage your campaigns, generate concepts, and schedule assets.",
+    "quick_actions": {
+      "create_campaign": "Create Campaign",
+      "generate_ideas": "Generate Ideas",
+      "analyze_performance": "Analyze Performance",
+      "schedule_campaign": "Schedule Campaign"
+    },
+    "processing": "Processing",
+    "thinking": "Thinking...",
+    "error": "An error occurred. Please try again.",
+    "placeholder": "Ask me anything about your campaigns..."
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "Unauthorized. Please log in again.",
+    "not_found": "Resource not found.",
+    "validation": "Please check your input and try again.",
+    "quota_exceeded": "API quota exceeded. Please try again later.",
+    "save_failed": "Failed to save changes.",
+    "delete_failed": "Failed to delete item.",
+    "load_failed": "Failed to load data."
+  },
+  "seo": {
+    "title": "SEO Analysis",
+    "keywords": "Keywords",
+    "hashtags": "Hashtags",
+    "meta_description": "Meta Description",
+    "score": "SEO Score",
+    "rationale": "Analysis",
+    "report": "SEO Report",
+    "generate_report": "Generate SEO Report"
+  },
+  "ads": {
+    "headline": "Headline",
+    "body": "Body Copy",
+    "cta": "Call to Action",
+    "platform": "Platform",
+    "visual": "Visual",
+    "generate_visual": "Generate Visual",
+    "variant": "Variant",
+    "variation_a": "Variation A",
+    "variation_b": "Variation B",
+    "scheduled_for": "Scheduled for",
+    "not_scheduled": "Not scheduled"
+  },
+  "language": {
+    "select": "Select Language",
+    "current": "Current Language"
+  }
+}

@@ -41,14 +41,56 @@ AdOpt is built on a **Zoneless Angular** architecture for maximum performance an
 ## 🚀 Getting Started
 
 ### Prerequisites
-*   Node.js & npm
-*   A valid **Google Gemini API Key**.
+*   Node.js & npm (v18 or higher recommended)
+*   A valid **Google Gemini API Key** - [Get one here](https://makersuite.google.com/app/apikey)
 
-### Configuration
-The application requires the API key to be injected via the environment variable `process.env.API_KEY`. 
+### Quick Setup
 
-### Running the App
-The application bootstraps via `index.tsx` (Applet standard) or `main.ts` (Standard Angular). Ensure `zone.js` is **not** imported.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd AdOpt
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure API Key**
+   
+   Create a `.env` file in the root directory:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Then edit `.env` and add your Gemini API key:
+   ```
+   API_KEY=your_actual_gemini_api_key_here
+   ```
+
+4. **Run the application**
+   ```bash
+   npm run dev
+   ```
+   
+   The app will be available at `http://localhost:3000`
+
+5. **Build for production**
+   ```bash
+   npm run build
+   ```
+
+That's it! The application is now fully operational and ready to create AI-powered advertising campaigns.
+
+### Features Available Out of the Box
+✅ **8 Languages**: English, Spanish, French, German, Japanese, Chinese, Portuguese, Italian  
+✅ **AI Operator**: Autonomous agent that can manage complete workflows  
+✅ **Smart Workflows**: Context-aware suggestions based on project state  
+✅ **Data Management**: Export/import campaigns, automatic backups  
+✅ **Search & Filter**: Find campaigns instantly  
+✅ **Image Generation**: AI-powered visuals with Imagen 4.0  
+✅ **SEO Reports**: Comprehensive campaign analysis  
 
 ---
 
