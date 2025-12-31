@@ -1,0 +1,6 @@
+{
+  "common": {"app_name": "AdOpt", "loading": "Cargando...", "save": "Guardar", "cancel": "Cancelar", "delete": "Eliminar", "create": "Crear", "search": "Buscar"},
+  "dashboard": {"title": "Campañas", "subtitle": "Administra tus conceptos publicitarios.", "new_campaign": "Nueva Campaña", "create_campaign": "Crear Campaña"},
+  "ai_operator": {"title": "Operador AdOpt", "status": "Sistema Activo", "welcome": "Soy el operador del sistema. Puedo ayudarte a gestionar campañas."},
+  "language": {"select": "Seleccionar Idioma"}
+}

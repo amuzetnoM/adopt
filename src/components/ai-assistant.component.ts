@@ -229,7 +229,7 @@ export class AiAssistantComponent {
 
     try {
       // 1. Send initial user message
-      let response = await this.chatSession.sendMessage(userText);
+      let response = await this.chatSession.sendMessage({ message: userText });
       
       // 2. Loop to handle ANY tool calls
       while (response.candidates?.[0]?.content?.parts?.some(p => !!p.functionCall)) {
@@ -269,13 +269,7 @@ export class AiAssistantComponent {
         }
 
         // Send tool outputs back to model
-        // IMPORTANT: Must wrap in a Content object with role 'tool'
-        const toolContent: Content = {
-          role: 'tool',
-          parts: functionResponses
-        };
-
-        response = await this.chatSession.sendMessage(toolContent);
+        response = await this.chatSession.sendMessage({ message: functionResponses });
       }
 
       // 3. Final Text Response

@@ -5,16 +5,20 @@ import { ProjectDetailComponent } from './components/project-detail.component';
 import { SetupFormComponent } from './components/setup-form.component';
 import { IntegrationWizardComponent } from './components/integration-wizard.component';
 import { AiAssistantComponent } from './components/ai-assistant.component';
+import { LanguageSwitcherComponent } from './components/language-switcher.component';
+import { ToastNotificationsComponent } from './components/toast-notifications.component';
 import { StorageService, ProjectParams } from './services/storage.service';
+import { I18nService } from './services/i18n.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, DashboardComponent, ProjectDetailComponent, SetupFormComponent, IntegrationWizardComponent, AiAssistantComponent],
+  imports: [CommonModule, DashboardComponent, ProjectDetailComponent, SetupFormComponent, IntegrationWizardComponent, AiAssistantComponent, LanguageSwitcherComponent, ToastNotificationsComponent],
   templateUrl: './app.component.html'
 })
 export class AppComponent {
   storage = inject(StorageService);
+  i18n = inject(I18nService);
 
   // We now read signals directly from storage which the AI can also manipulate
   currentView = this.storage.currentView;
