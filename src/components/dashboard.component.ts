@@ -1,11 +1,12 @@
-import { Component, inject, output } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StorageService, Project } from '../services/storage.service';
+import { ProjectSearchComponent } from './project-search.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ProjectSearchComponent],
   template: `
     <div class="w-full">
       <!-- Dashboard Header -->
@@ -21,6 +22,9 @@ import { StorageService, Project } from '../services/storage.service';
         </button>
       </div>
 
+      <!-- Search and Filter -->
+      <app-project-search (onFilterChange)="filteredProjects.set($event)"></app-project-search>
+
       <!-- Responsive Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         
@@ -35,7 +39,7 @@ import { StorageService, Project } from '../services/storage.service';
             <p class="text-slate-500 text-sm mt-2 max-w-[200px]">Start a new strategy with automated insights.</p>
         </div>
 
-        @for (project of storage.projects(); track project.id) {
+        @for (project of displayProjects(); track project.id) {
             <div (click)="onSelect.emit(project.id)" class="group bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col h-full overflow-hidden relative animate-fade-in-up" [style.animation-delay]="$index * 50 + 'ms'">
               
               <!-- Decoration -->
@@ -101,6 +105,12 @@ export class DashboardComponent {
   storage = inject(StorageService);
   onCreate = output<void>();
   onSelect = output<string>();
+
+  filteredProjects = signal<Project[]>(this.storage.projects());
+
+  displayProjects() {
+    return this.filteredProjects().length > 0 ? this.filteredProjects() : this.storage.projects();
+  }
 
   getStatusClass(status: string): string {
     switch (status) {

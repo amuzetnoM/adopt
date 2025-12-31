@@ -68,8 +68,11 @@
 
     <!-- User Profile Footer -->
     <div class="p-4 border-t border-slate-800 shrink-0 space-y-3">
-      <!-- Language Switcher -->
-      <app-language-switcher></app-language-switcher>
+      <!-- Settings and Language -->
+      <div class="flex items-center gap-2">
+        <app-settings-menu></app-settings-menu>
+        <app-language-switcher></app-language-switcher>
+      </div>
       
       <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 backdrop-blur-sm">
         <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-sky-400 to-indigo-500 shadow-lg shrink-0"></div>
