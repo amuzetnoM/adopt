@@ -1,9 +1,9 @@
-# AdOpt: AI-Driven Advertising Platform
+# ADOPT Studio: AI-Driven Advertising Platform
 > Legion: Ad Operators
 
-**AdOpt** is an enterprise-grade, single-page application (SPA) built with Angular v18+ (Zoneless) that leverages Google's Gemini 2.5 Flash and Imagen 4.0 models to automate the entire advertising campaign lifecycle. 
+**ADOPT Studio** is an enterprise-grade, single-page application (SPA) built with Angular v18+ (Zoneless) that leverages Google's Gemini 2.5 Flash and Imagen 4.0 models to automate the entire advertising campaign lifecycle. 
 
-From brand analysis to visual asset generation and SEO reporting, AdOpt acts as a creative agency in a box.
+From brand analysis to visual asset generation and SEO reporting, ADOPT Studio acts as a creative agency in a box.
 
 ---
 
@@ -271,4 +271,4 @@ interface FinalAd {
 
 ---
 
-**AdOpt v2.0** - *Autonomous Advertising Operations Platform*
+**ADOPT Studio v2.0** - *Autonomous Advertising Operations Platform*
