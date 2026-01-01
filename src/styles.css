@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Neomorphic Color Palette */
+    --neo-bg: #e4e7ec;
+    --neo-bg-dark: #d1d5db;
+    --neo-bg-light: #f3f4f6;
+    --neo-surface: #e8eaed;
+    --neo-text: #4b5563;
+    --neo-text-dark: #1f2937;
+    --neo-accent: #6366f1;
+    --neo-accent-light: #818cf8;
+    --neo-accent-vivid: #5b5ff8;
+
+    /* Neomorphic Shadows */
+    --neo-shadow-light: -8px -8px 16px rgba(255, 255, 255, 0.8), 8px 8px 16px rgba(0, 0, 0, 0.1);
+    --neo-shadow-inset: inset 4px 4px 8px rgba(0, 0, 0, 0.08), inset -4px -4px 8px rgba(255, 255, 255, 0.8);
+    --neo-shadow-flat: 4px 4px 12px rgba(0, 0, 0, 0.08), -4px -4px 12px rgba(255, 255, 255, 0.8);
+    --neo-shadow-hover: -10px -10px 20px rgba(255, 255, 255, 0.9), 10px 10px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .dark {
+    /* Dark mode accent colors - more vivid */
+    --neo-accent: #7c7ff9;
+    --neo-accent-light: #9d9ffc;
+    --neo-accent-vivid: #6d70ff;
+    
+    /* Dark mode shadows */
+    --neo-shadow-light: -8px -8px 16px rgba(255, 255, 255, 0.05), 8px 8px 16px rgba(0, 0, 0, 0.5);
+    --neo-shadow-inset: inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(255, 255, 255, 0.05);
+    --neo-shadow-flat: 4px 4px 12px rgba(0, 0, 0, 0.6), -4px -4px 12px rgba(255, 255, 255, 0.03);
+    --neo-shadow-hover: -10px -10px 20px rgba(255, 255, 255, 0.08), 10px 10px 20px rgba(0, 0, 0, 0.7);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #e4e7ec 0%, #f0f2f5 100%);
+    color: #374151;
+  }
+
+  .dark body {
+    background: linear-gradient(135deg, #1a1d23 0%, #0f1115 100%);
+    color: #e5e7eb;
+  }
+}
+
+@layer utilities {
+  /* Neomorphic Utilities */
+  .neo-raised {
+    box-shadow: var(--neo-shadow-light);
+  }
+
+  .neo-inset {
+    box-shadow: var(--neo-shadow-inset);
+  }
+
+  .neo-flat {
+    box-shadow: var(--neo-shadow-flat);
+  }
+
+  .neo-hover:hover {
+    box-shadow: var(--neo-shadow-hover);
+  }
+
+  /* Custom scrollbar with neomorphic style */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--neo-bg);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #c7cad1 0%, #b0b4bc 100%);
+    border-radius: 10px;
+    box-shadow: inset 2px 2px 4px rgba(255, 255, 255, 0.3);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-track {
+    background: #1a1d23;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #3a3d45 0%, #2a2d35 100%);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #b0b4bc 0%, #9ca0a8 100%);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #4a4d55 0%, #3a3d45 100%);
+  }
+
+  /* Global Animations */
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.4s ease-out;
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Vivid accent colors for dark mode */
+  .dark .text-indigo-600 {
+    color: #7c7ff9;
+  }
+
+  .dark .text-indigo-500 {
+    color: #8b8dfc;
+  }
+
+  .dark .text-indigo-400 {
+    color: #9d9ffc;
+  }
+
+  .dark .bg-indigo-600 {
+    background-color: #6d70ff;
+  }
+
+  .dark .bg-indigo-500 {
+    background-color: #7c7ff9;
+  }
+
+  .dark .bg-indigo-400 {
+    background-color: #8b8dfc;
+  }
+
+  .dark .border-indigo-600 {
+    border-color: #7c7ff9;
+  }
+
+  .dark .hover\:bg-indigo-700:hover {
+    background-color: #5b5ff8;
+  }
+
+  .dark .accent-indigo-600 {
+    accent-color: #7c7ff9;
+  }
+}

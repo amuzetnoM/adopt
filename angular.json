@@ -19,6 +19,9 @@
             "browser": "index.tsx",
             "tsConfig": "tsconfig.json",
             "inlineStyleLanguage": "css",
+            "styles": [
+              "src/styles.css"
+            ],
             "optimization": {
               "fonts": false
             }
