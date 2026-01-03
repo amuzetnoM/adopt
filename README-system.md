@@ -1,5 +1,7 @@
-# ADOPT Studio
+# ADOPT STUDIO
 > Ad, on Command
+<br>
+
 > Legion: Ad Operators
 
 **ADOPT Studio** is an enterprise-grade, single-page application (SPA) built with Angular v18+ (Zoneless) that leverages Google's Gemini 2.5 Flash and Imagen 4.0 models to automate the entire advertising campaign lifecycle.
