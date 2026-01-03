@@ -130,6 +130,15 @@ AdOpt is built on a **Zoneless Angular** architecture for maximum performance an
    npm run build
    ```
 
+6. **Deploy to Vercel** (Optional)
+   
+   See [VERCEL-DEPLOYMENT.md](./VERCEL-DEPLOYMENT.md) for complete deployment instructions.
+   
+   Quick deploy:
+   ```bash
+   npm run vercel:deploy:prod
+   ```
+
 That's it! The application is now fully operational and ready to create AI-powered advertising campaigns.
 
 ### Features Available Out of the Box
